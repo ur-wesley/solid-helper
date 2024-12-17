@@ -3,24 +3,36 @@ import { $ } from "bun";
 const tag = Bun.argv[2];
 
 if (!tag) {
-  throw new Error("TAG is required");
+  console.error("Error: TAG is required");
+  process.exit(1);
 }
 
-switch (tag) {
-  case "major":
-    await $`npm version major`;
-    break;
-  case "minor":
-    await $`npm version minor`;
-    break;
-  case "patch":
-    await $`npm version patch`;
-    break;
-  default:
-    throw new Error("Invalid tag");
+if (tag !== "patch" && tag !== "minor" && tag !== "major") {
+  console.error("Error: TAG must be 'patch', 'minor', or 'major'");
+  process.exit(1);
 }
 
-const version = require("./package.json").version;
+try {
+  await $`npm version ${tag}`;
+} catch (error) {
+  console.error("Error: Failed to update npm version", error);
+  process.exit(1);
+}
 
-await $`git tag v${version}`;
-await $`git push origin v${version}`;
+import { version } from "./package.json";
+const tagName = `v${version}`;
+
+try {
+  await $`git rev-parse ${tagName}`;
+  console.log(`Tag ${tagName} already exists`);
+  process.exit(0);
+} catch {
+  try {
+    await $`git tag ${tagName}`;
+    await $`git push origin ${tagName}`;
+    console.log(`Tag ${tagName} created and pushed successfully`);
+  } catch (error) {
+    console.error("Error: Failed to create or push git tag", error);
+    process.exit(1);
+  }
+}
