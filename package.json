@@ -1,0 +1,26 @@
+{
+  "name": "@ur-wesley/solid-helper",
+  "version": "0.1.1",
+  "description": "utilities and unstyled components for SolidJS",
+  "main": "./dist/index.cjs.js",
+  "module": "./dist/index.es.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.es.js",
+      "require": "./dist/index.cjs.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "peerDependencies": {
+    "solid-js": "^1.9.3"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "license": "MIT"
+}
