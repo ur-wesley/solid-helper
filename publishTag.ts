@@ -3,36 +3,40 @@ import { $ } from "bun";
 const tag = Bun.argv[2];
 
 if (!tag) {
-  console.error("Error: TAG is required");
-  process.exit(1);
-}
-
-if (tag !== "patch" && tag !== "minor" && tag !== "major") {
-  console.error("Error: TAG must be 'patch', 'minor', or 'major'");
+  console.error("Usage: bun run version-push.ts <version>");
+  console.error("Example: bun run version-push.ts patch | minor | major");
   process.exit(1);
 }
 
 try {
-  await $`npm version ${tag}`;
-} catch (error) {
-  console.error("Error: Failed to update npm version", error);
-  process.exit(1);
-}
+  // 1. Bump version in package.json
+  console.log(`Bumping version (${tag})...`);
+  await $`bunx semver --bump ${tag}`;
 
-const version = require("./package.json").version;
-const tagName = `v${version}`;
+  // 2. Get the new version from package.json
+  const packageJson = await Bun.file("package.json").text();
+  const newVersion = JSON.parse(packageJson).version;
 
-try {
-  await $`git rev-parse ${tagName}`;
-  console.log(`Tag ${tagName} already exists`);
-  process.exit(0);
-} catch {
-  try {
-    await $`git tag ${tagName}`;
-    await $`git push origin ${tagName}`;
-    console.log(`Tag ${tagName} created and pushed successfully`);
-  } catch (error) {
-    console.error("Error: Failed to create or push git tag", error);
+  if (!newVersion) {
+    console.error("Failed to determine the new version from package.json.");
     process.exit(1);
   }
+
+  console.log(`New version: v${newVersion}`);
+
+  // 3. Commit the changes
+  await $`git add package.json`;
+  await $`git commit -m "chore(release): bump version to ${newVersion}"`;
+
+  // 4. Create a git tag
+  const tagName = `v${newVersion}`;
+  await $`git tag ${tagName}`;
+  console.log(`Created tag: ${tagName}`);
+
+  // 5. Push changes and tag to the remote repository
+  await $`git push origin main --follow-tags`;
+  console.log(`Pushed changes and tag: ${tagName}`);
+} catch (error) {
+  console.error("Error occurred:", error);
+  process.exit(1);
 }
