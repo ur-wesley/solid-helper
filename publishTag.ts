@@ -20,7 +20,7 @@ switch (tag) {
     throw new Error("Invalid tag");
 }
 
-const version = require("./package.json").version;
+const version = "v" + require("./package.json").version;
 
 await $`git tag ${version}`;
 await $`git push origin ${version}`;
