@@ -19,7 +19,7 @@ try {
   process.exit(1);
 }
 
-import { version } from "./package.json";
+const version = require("./package.json").version;
 const tagName = `v${version}`;
 
 try {
