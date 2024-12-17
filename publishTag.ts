@@ -24,16 +24,27 @@ try {
 
   console.log(`New version: v${newVersion}`);
 
-  // 3. Commit the changes
-  await $`git add package.json`;
-  await $`git commit -m "chore(release): bump version to ${newVersion}"`;
+  // 3. Check if there are changes to commit
+  const status = await $`git status --porcelain`;
+  if (status.stdout.toString().trim()) {
+    // 4. Commit the changes
+    await $`git add package.json`;
+    await $`git commit -m "chore(release): bump version to ${newVersion}"`;
+  } else {
+    console.log("No changes to commit");
+  }
 
-  // 4. Create a git tag
+  // 5. Create a git tag
   const tagName = `v${newVersion}`;
-  await $`git tag ${tagName}`;
-  console.log(`Created tag: ${tagName}`);
+  try {
+    await $`git rev-parse --verify ${tagName}`;
+    console.log(`Tag ${tagName} already exists`);
+  } catch {
+    await $`git tag ${tagName}`;
+    console.log(`Created tag: ${tagName}`);
+  }
 
-  // 5. Push changes and tag to the remote repository
+  // 6. Push changes and tag to the remote repository
   await $`git push origin main --follow-tags`;
   console.log(`Pushed changes and tag: ${tagName}`);
 } catch (error) {
