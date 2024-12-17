@@ -26,7 +26,8 @@
   "scripts": {
     "format": "prettier --write .",
     "dev": "vite",
-    "build": "vite build && tsc"
+    "build": "vite build && tsc",
+    "publish": "bun run ./publishTag.ts"
   },
   "license": "MIT"
 }
