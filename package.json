@@ -27,7 +27,7 @@
     "format": "prettier --write .",
     "dev": "vite",
     "build": "vite build && tsc",
-    "publish": "bun run ./publishTag.ts"
+    "release": "bun run ./publishTag.ts"
   },
   "license": "MIT"
 }
