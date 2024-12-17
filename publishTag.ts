@@ -11,7 +11,7 @@ if (!tag) {
 try {
   // 1. Bump version in package.json
   console.log(`Bumping version (${tag})...`);
-  await $`bunx semver --bump ${tag}`;
+  await $`npm version ${tag}`;
 
   // 2. Get the new version from package.json
   const packageJson = await Bun.file("package.json").text();
