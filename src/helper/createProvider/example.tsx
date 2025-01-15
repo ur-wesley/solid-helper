@@ -1,4 +1,4 @@
-import { createProvider } from "./createProvider";
+import { createProvider } from "../../index.js";
 import { render } from "solid-js/web";
 
 type AuthStore = {

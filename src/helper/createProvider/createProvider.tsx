@@ -17,7 +17,7 @@ type ActionsType = Record<string, (...args: any[]) => any>;
  * @returns {{ Provider: (props: { children: JSXElement }) => JSX.Element, useStore: () => [TStore, TActions] }}
  *          An object containing the `Provider` component and the `useStore` hook.
  */
-export function createProvider<
+export default function createProvider<
   TStore extends StoreType,
   TActions extends ActionsType,
 >(

@@ -10,7 +10,7 @@ type ActionsType = Record<string, (...args: any[]) => any>;
  * @param createActions - A function to define actions for the store.
  * @returns A tuple of [store, actions] wrapped in createRoot.
  */
-export function createContextStore<
+export default function createContextStore<
   TStore extends StoreType,
   TActions extends ActionsType,
 >(

@@ -1,4 +1,4 @@
-import { createContextStore } from "./createContextStore";
+import { createContextStore } from "../../index.js";
 
 type User = { id: string; email: string } | null;
 

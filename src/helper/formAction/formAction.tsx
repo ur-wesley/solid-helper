@@ -105,4 +105,4 @@ function createFormAction(
   ] as const;
 }
 
-export { createFormAction };
+export default createFormAction;
