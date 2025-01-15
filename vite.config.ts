@@ -7,8 +7,8 @@ export default defineConfig({
   build: {
     lib: {
       entry: path.resolve(__dirname, "src/index.ts"),
-      name: "solidhelper", // UMD global name
-      formats: ["es", "cjs"], // Build ESM and CommonJS
+      name: "solidhelper",
+      formats: ["es"],
       fileName: (format) => `index.${format}.js`,
     },
     rollupOptions: {
