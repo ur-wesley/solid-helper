@@ -9,6 +9,15 @@
     ".": {
       "default": "./dist/index.es.js",
       "import": "./dist/index.es.js"
+    },
+    "./createFormAction": {
+      "import": "./dist/helper/formAction/formAction.js"
+    },
+    "./createProvider": {
+      "import": "./dist/helper/createProvider/createProvider.js"
+    },
+    "./createContextStore": {
+      "import": "./dist/helper/createContextStore/createContextStore.js"
     }
   },
   "files": [
