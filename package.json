@@ -8,16 +8,20 @@
   "exports": {
     ".": {
       "default": "./dist/index.es.js",
-      "import": "./dist/index.es.js"
+      "import": "./dist/index.es.js",
+      "types": "./dist/index.d.ts"
     },
     "./createFormAction": {
-      "import": "./dist/helper/formAction/formAction.js"
+      "import": "./dist/helper/formAction/formAction.js",
+      "types": "./dist/helper/formAction/formAction.d.ts"
     },
     "./createProvider": {
-      "import": "./dist/helper/createProvider/createProvider.js"
+      "import": "./dist/helper/createProvider/createProvider.js",
+      "types": "./dist/helper/createProvider/createProvider.d.ts"
     },
     "./createContextStore": {
-      "import": "./dist/helper/createContextStore/createContextStore.js"
+      "import": "./dist/helper/createContextStore/createContextStore.js",
+      "types": "./dist/helper/createContextStore/createContextStore.d.ts"
     }
   },
   "files": [
