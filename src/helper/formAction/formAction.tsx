@@ -14,7 +14,7 @@ type FormProps = Omit<
 /**
  * Creates a reactive form handler with state management for pending, success, and error states.
  *
- * @param {function<T = any>(FormData): Promise<T>} processFormData - A function to process form data asynchronously.
+ * @param {function(FormData): Promise} processFormData - A function to process form data asynchronously.
  *
  * @returns {[() => FormState, { Form: ParentComponent<FormProps> }]}
  *          A tuple containing:
@@ -34,7 +34,7 @@ type FormProps = Omit<
  * console.log(state().pending); // Access form state
  */
 function createFormAction(
-  processFormData: <T = any>(formData: FormData) => Promise<T>,
+  processFormData: (formData: FormData) => Promise<void>,
 ): [() => FormState, { Form: ParentComponent<FormProps> }] {
   const [state, setState] = createSignal<FormState>({
     pending: false,
