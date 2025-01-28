@@ -8,6 +8,7 @@ if (!tag) {
   process.exit(1);
 }
 
+let tagName = "";
 try {
   // 1. Bump version in package.json
   console.log(`Bumping version (${tag})...`);
@@ -35,7 +36,7 @@ try {
   }
 
   // 5. Create a git tag
-  const tagName = `v${newVersion}`;
+  tagName = `v${newVersion}`;
   try {
     await $`git rev-parse --verify ${tagName}`;
     console.log(`Tag ${tagName} already exists`);
@@ -49,5 +50,7 @@ try {
   console.log(`Pushed changes and tag: ${tagName}`);
 } catch (error) {
   console.error("Error occurred:", error);
+  // remove the tag if it was created
+  await $`git tag -d ${tagName}`;
   process.exit(1);
 }
