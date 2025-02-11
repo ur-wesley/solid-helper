@@ -4,6 +4,8 @@ type FormState = {
   pending: boolean;
   success: boolean;
   error: Error | null;
+  dirty: boolean;
+  touched: boolean;
 };
 
 type FormProps = Omit<
@@ -12,26 +14,12 @@ type FormProps = Omit<
 >;
 
 /**
- * Creates a reactive form handler with state management for pending, success, and error states.
+ * Creates a reactive form handler with state management for pending, success, error,
+ * dirty, and touched states.
  *
- * @param {function(FormData): Promise} processFormData - A function to process form data asynchronously.
+ * @param {function(FormData): Promise<void>} processFormData - A function to process form data asynchronously.
  *
  * @returns {[() => FormState, { Form: ParentComponent<FormProps> }]}
- *          A tuple containing:
- *          - `state`: A signal function returning the form state.
- *          - `Form`: A component for rendering the form with built-in submission handling.
- *
- * @example
- * const [state, { Form }] = createFormAction(async (formData) => {
- *   await fetch("/api/submit", { method: "POST", body: formData });
- * });
- *
- * <Form>
- *   <input type="text" name="username" required />
- *   <button type="submit">Submit</button>
- * </Form>
- *
- * console.log(state().pending); // Access form state
  */
 function createFormAction(
   processFormData: (formData: FormData) => Promise<void>,
@@ -40,11 +28,39 @@ function createFormAction(
     pending: false,
     success: false,
     error: null,
+    dirty: false,
+    touched: false,
   });
+
+  function getFormData(form: HTMLFormElement): Record<string, any> {
+    const formData = new FormData(form);
+    const obj: Record<string, any> = {};
+    formData.forEach((value, key) => {
+      obj[key] = value;
+    });
+    return obj;
+  }
+
+  let formElem: HTMLFormElement | null = null;
+  // Store the initial snapshot as a JSON string.
+  let initialSnapshot: string | null = null;
 
   const Form: ParentComponent<FormProps> = (props) => {
     const [localProps, nativeProps] = splitProps(props, ["children", "ref"]);
-    let formElem: HTMLFormElement | null = null;
+
+    function handleInput() {
+      if (formElem) {
+        const currentSnapshot = JSON.stringify(getFormData(formElem));
+        setState((prev) => ({
+          ...prev,
+          dirty: currentSnapshot !== initialSnapshot,
+        }));
+      }
+    }
+
+    function handleBlur() {
+      setState((prev) => ({ ...prev, touched: true }));
+    }
 
     async function handleKeyDown(event: KeyboardEvent) {
       if (event.key === "Enter") {
@@ -63,7 +79,13 @@ function createFormAction(
         if (!formElem) return new Error("form element not found");
         const formData = new FormData(formElem);
 
-        setState({ pending: true, success: false, error: null });
+        setState({
+          pending: true,
+          success: false,
+          error: null,
+          dirty: state().dirty,
+          touched: state().touched,
+        });
 
         const inputs = formElem.querySelectorAll("input");
         const inputError = Array.from(inputs).find(
@@ -72,14 +94,29 @@ function createFormAction(
         if (!formElem.checkValidity() || inputError) {
           formElem.reportValidity();
           const formError = new Error("Form is not valid");
-          setState({ pending: false, success: false, error: formError });
+          setState((prev) => ({
+            ...prev,
+            pending: false,
+            success: false,
+            error: formError,
+          }));
           return false;
         }
 
         await processFormData(formData);
-        setState({ pending: false, success: true, error: null });
+        setState((prev) => ({
+          ...prev,
+          pending: false,
+          success: true,
+          error: null,
+        }));
       } catch (error: any) {
-        setState({ pending: false, success: false, error: error });
+        setState((prev) => ({
+          ...prev,
+          pending: false,
+          success: false,
+          error: error,
+        }));
       }
       return false;
     }
@@ -87,9 +124,18 @@ function createFormAction(
     return (
       <form
         role="form"
-        ref={formElem!}
+        ref={(el) => {
+          formElem = el;
+          if (formElem && initialSnapshot === null) {
+            const data = getFormData(formElem);
+            initialSnapshot = JSON.stringify(data);
+          }
+          if (typeof localProps.ref === "function") localProps.ref(el);
+        }}
         onSubmit={submit}
         onkeydown={handleKeyDown}
+        oninput={handleInput}
+        onblur={handleBlur}
         {...nativeProps}
       >
         {localProps.children}
@@ -98,9 +144,9 @@ function createFormAction(
   };
 
   return [
-    state!,
+    state,
     {
-      Form: Form!,
+      Form,
     },
   ] as const;
 }
