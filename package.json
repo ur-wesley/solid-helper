@@ -1,6 +1,6 @@
 {
   "name": "@ur-wesley/solid-helper",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "utilities and unstyled components for SolidJS",
   "type": "module",
   "main": "./dist/index.es.js",
